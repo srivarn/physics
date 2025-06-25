@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+const fs = require('fs');
 
 const formulas = [
   { id: 1, name: 'Velocity', formula: 'v = d / t' },
@@ -44,9 +44,30 @@ const formulas = [
   { id: 41, name: 'Heisenberg Uncertainty Principle', formula: 'ΔxΔp ≥ ħ/2' },
   { id: 42, name: 'Schrödinger Equation', formula: 'iħ(∂ψ/∂t) = Hψ' },
   { id: 43, name: 'Mass-Energy Equivalence', formula: 'E = mc^2' },
-{ id: 44, name: 'De Broglie Wavelength', formula: 'λ = h/(mv)' },
+  { id: 44, name: 'De Broglie Wavelength', formula: 'λ = h/p' },
 ];
 
-export async function GET() {
-  return NextResponse.json(formulas);
+formulas.forEach(formula => {
+  const fileName = formula.name.toLowerCase().replace(/ /g, '_') + '.tsx';
+  const filePath = `app/formulas/${fileName}`;
+
+  const content = `
+"use client";
+
+import Calculator from '../components/Calculator';
+
+export default function ${formula.name.replace(/ /g, '')}Page() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-900 text-white">
+      <h1>${formula.name}</h1>
+      <p>${formula.name} is a physics concept.</p>
+      <p>Formula: ${formula.formula}</p>
+      <Calculator />
+    </div>
+  );
 }
+`;
+
+  fs.writeFileSync(filePath, content);
+  console.log(`Created ${filePath}`);
+});
